@@ -1,0 +1,62 @@
+{
+  "name": "@retentioneering/retentioneering-dom-observer",
+  "version": "1.0.0",
+  "description": "observe DOM changes & parse it declaratively ",
+  "main": "./dist/dom-observer.cjs.js",
+  "jsnext:main": "./dist/dom-observer.es.js",
+  "module": "./dist/dom-observer.es.js",
+  "umd:main": "./dist/dom-observer.umd.js",
+  "browser": "./dist/dom-observer.es.js",
+  "scripts": {
+    "build": "rollup -c rollup.config.js",
+    "test": "tsc -p tsconfig.test.json && mocha './test-out/**/*.spec.js' --require 'setup-jsdom.js' && cross-env rm -r ./test-out",
+    "test-watch": "tsc-watch -p tsconfig.test.json --onSuccess \"mocha './test-out/**/*.spec.js' --require 'setup-jsdom.js'\"",
+    "lint": "eslint \"./**/*.{js,ts,tsx}\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/retentioneering/dom-observer.git"
+  },
+  "keywords": [
+    "dom",
+    "parser",
+    "mutation",
+    "observer",
+    "no dependency"
+  ],
+  "author": "retentioneering",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/retentioneering/dom-observer/issues"
+  },
+  "homepage": "https://github.com/retentioneering/dom-observer#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/core": "^7.9.6",
+    "@babel/preset-env": "^7.9.6",
+    "@types/chai": "^4.2.11",
+    "@types/jsdom": "^16.2.2",
+    "@types/mocha": "^7.0.2",
+    "@types/sinon": "^9.0.1",
+    "@typescript-eslint/eslint-plugin": "^2.33.0",
+    "@typescript-eslint/parser": "^2.33.0",
+    "babel-plugin-module-resolver": "^4.0.0",
+    "chai": "^4.2.0",
+    "cross-env": "^7.0.2",
+    "eslint": "^7.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "jsdom": "^16.2.2",
+    "mocha": "^7.1.2",
+    "rollup": "^2.10.2",
+    "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-terser": "^5.3.0",
+    "rollup-plugin-typescript2": "^0.27.1",
+    "sinon": "^9.0.2",
+    "tsc-watch": "^4.2.5",
+    "typescript": "^3.9.2"
+  },
+  "files": [
+    "./dist"
+  ],
+  "typings": "./dist"
+}
