@@ -1,6 +1,6 @@
 # Retentioneering DOM Observer
 
-The package contains tools for parsing DOM data & observing DOM changes.
+The package contains tools for parsing DOM data, observing DOM and tracking changes.
 
 **Dependency free!**
 

@@ -1,7 +1,7 @@
 {
   "name": "@retentioneering/retentioneering-dom-observer",
-  "version": "1.0.0",
-  "description": "observe DOM changes & parse it declaratively ",
+  "version": "1.0.5",
+  "description": "The package contains tools for parsing DOM data, observing DOM and tracking changes.",
   "main": "./dist/dom-observer.cjs.js",
   "jsnext:main": "./dist/dom-observer.es.js",
   "module": "./dist/dom-observer.es.js",
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/retentioneering/dom-observer.git"
+    "url": "git+https://github.com/retentioneering/retentioneering-dom-observer"
   },
   "keywords": [
     "dom",
@@ -25,11 +25,11 @@
     "no dependency"
   ],
   "author": "retentioneering",
-  "license": "ISC",
+  "license": "SEE LICENSE IN LICENSE.md",
   "bugs": {
-    "url": "https://github.com/retentioneering/dom-observer/issues"
+    "url": "https://github.com/retentioneering/retentioneering-dom-observer/issues"
   },
-  "homepage": "https://github.com/retentioneering/dom-observer#readme",
+  "homepage": "https://github.com/retentioneering/retentioneering-dom-observer#readme",
   "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.9.6",
@@ -56,7 +56,7 @@
     "typescript": "^3.9.2"
   },
   "files": [
-    "./dist/**/*"
+    "dist"
   ],
   "typings": "./dist"
 }
