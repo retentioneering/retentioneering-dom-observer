@@ -29,16 +29,24 @@ type ParseConfigBoolean = {
     selector: string
 }
 
+type ParseConfigNumber = {
+    type: "number"
+    selector: string
+    formatter: (value: string | null, el: HTMLElement | null) => number | null
+}
+
 export type ParserConfig =
     | ParserConfigObject
     | ParserConfigArray
     | ParserConfigString
     | ParseConfigBoolean
+    | ParseConfigNumber
 
 export type ParseDomResult =
     | string
     | null
     | boolean
+    | number
     | Array<ParseDomResult>
     | {
           [key: string]: ParseDomResult
@@ -61,6 +69,15 @@ export function parseDOM(
         )
         return targetElement ? targetElement.textContent : null
     }
+    if (config.type === "number") {
+        const parentElement = rootElement || window.document
+        const targetElement = parentElement.querySelector<HTMLElement>(
+            config.selector
+        )
+        const value = targetElement ? targetElement.textContent : null
+        return config.formatter(value, targetElement)
+    }
+
     if (config.type === "boolean") {
         const parentElement = rootElement || window.document
         const targetElement = parentElement.querySelector<HTMLElement>(

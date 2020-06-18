@@ -49,6 +49,74 @@ describe("DomParser", () => {
         `)
     })
 
+    it("parse number", () => {
+        clearJSDOM()
+        setupJSDOM(`
+            <div class="b-reviews-offer-block">
+                <span>
+                    <div class="b-reviews-offer-block__rate">
+                        <a href="/catalog/phone/224/5722400/comments#mainContent">
+                            <div class="rating-universal-svg">
+                                <img src="https://cdn.svyaznoy.ru/upload/web/svyaznoy/img/product-block/rate_gray_small.svg" alt="">
+                                        <span itemprop="ratingValue" content="7"></span><span itemprop="worstRating" content="0"></span><span itemprop="bestRating" content="10"></span>
+                                    <div class="rating-universal-svg__empty"></div>
+                                <div class="rating-universal-svg__fill _rate7"></div>
+                            </div>
+                        </a>
+                    </div>
+                    <a href="/catalog/phone/224/5722400/comments#mainContent" class="b-reviews-offer-block__link">Отзывы&nbsp; <span>9</span></a>
+                        <br class="dich">
+                    <a href="/catalog/phone/224/5722400/faq#mainContent" class="b-reviews-offer-block__link _ques-answ">Вопросы&nbsp;и&nbsp;ответы&nbsp;<span>16/16</span></a>
+                </span>
+            </div>
+        `)
+        const result = parseDOM({            
+            type: "object",
+            keys: [
+                {
+                    key: "reviews",
+                    value: {
+                        type: "number",
+                        selector: ".b-reviews-offer-block .b-reviews-offer-block__link span",
+                        formatter: (v) => {
+                            if (v) {
+                                if (/\d+$/.test(v)) {
+                                    return Number(v)
+                                }
+                            }
+                            return null
+                        },
+                    },
+                },
+                {
+                    key: "rating",
+                    value: {
+                        type: "number",
+                        selector: ".b-reviews-offer-block .rating-universal-svg__fill",
+                        formatter: (v, el) => {
+                            if (el) {
+                                for (const className of el.classList) {
+                                    if (/_rate\d+$/.test(className)) {
+                                        const mathed = className.match(/\d+/)
+                                        if (mathed && mathed[0]) {
+                                            return Number(mathed[0]) * 10
+                                        }
+                                    }
+                                }
+                                return null
+                            }
+                            return null
+                        }
+                    },
+                },
+            ],
+        })
+        expect(result).to.be.deep.equal({
+            reviews: 9,
+            rating: 70
+        })
+    })
+
     it("parse simple string", () => {
         const result = parseDOM({
             type: "string",
