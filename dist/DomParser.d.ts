@@ -1,3 +1,10 @@
+/**
+ * By Alexey Avramenko and Retentioneering Team
+ * Copyright (C) 2020 Maxim Godzi, Anatoly Zaytsev, Retentioneering Team
+ * This Source Code Form is subject to the terms of the Retentioneering Software Non-Exclusive, Non-Commercial Use License (License)
+ * By using, sharing or editing this code you agree with the License terms and conditions.
+ * You can obtain License text at https://github.com/retentioneering/retentioneering-dom-observer/blob/master/LICENSE.md
+ */
 declare type ParserConfigObject = {
     type: "object";
     keys: {
@@ -18,8 +25,13 @@ declare type ParseConfigBoolean = {
     type: "boolean";
     selector: string;
 };
-export declare type ParserConfig = ParserConfigObject | ParserConfigArray | ParserConfigString | ParseConfigBoolean;
-export declare type ParseDomResult = string | null | boolean | Array<ParseDomResult> | {
+declare type ParseConfigNumber = {
+    type: "number";
+    selector: string;
+    formatter: (value: string | null, el: HTMLElement | null) => number | null;
+};
+export declare type ParserConfig = ParserConfigObject | ParserConfigArray | ParserConfigString | ParseConfigBoolean | ParseConfigNumber;
+export declare type ParseDomResult = string | null | boolean | number | Array<ParseDomResult> | {
     [key: string]: ParseDomResult;
 };
 /**
