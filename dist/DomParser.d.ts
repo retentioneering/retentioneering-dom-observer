@@ -19,7 +19,7 @@ declare type ParserConfigArray = {
 };
 declare type ParserConfigString = {
     type: "string";
-    selector: string;
+    selector?: string;
 };
 declare type ParseConfigBoolean = {
     type: "boolean";

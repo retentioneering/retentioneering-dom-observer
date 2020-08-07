@@ -21,7 +21,7 @@ type ParserConfigArray = {
 
 type ParserConfigString = {
     type: "string"
-    selector: string
+    selector?: string
 }
 
 type ParseConfigBoolean = {
@@ -49,8 +49,8 @@ export type ParseDomResult =
     | number
     | Array<ParseDomResult>
     | {
-          [key: string]: ParseDomResult
-      }
+        [key: string]: ParseDomResult
+    }
 
 /**
  * Parse a specific structure from the DOM recursively
@@ -64,6 +64,9 @@ export function parseDOM(
 ): ParseDomResult {
     if (config.type === "string") {
         const parentElement = rootElement || window.document
+        if (!config.selector) {
+            return parentElement.textContent
+        }
         const targetElement = parentElement.querySelector<HTMLElement>(
             config.selector
         )

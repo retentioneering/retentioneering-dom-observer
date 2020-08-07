@@ -1,6 +1,6 @@
 {
   "name": "@retentioneering/retentioneering-dom-observer",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "The package contains tools for parsing DOM data, observing DOM and tracking changes.",
   "main": "./dist/dom-observer.cjs.js",
   "jsnext:main": "./dist/dom-observer.es.js",
