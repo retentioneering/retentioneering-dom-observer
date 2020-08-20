@@ -25,12 +25,16 @@ declare type ParseConfigBoolean = {
     type: "boolean";
     selector: string;
 };
+declare type ParseConfigCount = {
+    type: "count";
+    selector: string;
+};
 declare type ParseConfigNumber = {
     type: "number";
     selector: string;
     formatter: (value: string | null, el: HTMLElement | null) => number | null;
 };
-export declare type ParserConfig = ParserConfigObject | ParserConfigArray | ParserConfigString | ParseConfigBoolean | ParseConfigNumber;
+export declare type ParserConfig = ParserConfigObject | ParserConfigArray | ParserConfigString | ParseConfigBoolean | ParseConfigNumber | ParseConfigCount;
 export declare type ParseDomResult = string | null | boolean | number | Array<ParseDomResult> | {
     [key: string]: ParseDomResult;
 };
