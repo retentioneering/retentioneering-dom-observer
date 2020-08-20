@@ -29,6 +29,11 @@ type ParseConfigBoolean = {
     selector: string
 }
 
+type ParseConfigCount = {
+    type: "count"
+    selector: string
+}
+
 type ParseConfigNumber = {
     type: "number"
     selector: string
@@ -41,6 +46,7 @@ export type ParserConfig =
     | ParserConfigString
     | ParseConfigBoolean
     | ParseConfigNumber
+    | ParseConfigCount
 
 export type ParseDomResult =
     | string
@@ -71,6 +77,11 @@ export function parseDOM(
             config.selector
         )
         return targetElement ? targetElement.textContent : null
+    }
+    if (config.type === "count") {
+        const parentElement = rootElement || window.document
+        const targetElements = parentElement.querySelectorAll<HTMLElement>(config.selector)
+        return targetElements.length
     }
     if (config.type === "number") {
         const parentElement = rootElement || window.document

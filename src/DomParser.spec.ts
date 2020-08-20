@@ -117,6 +117,58 @@ describe("DomParser", () => {
         })
     })
 
+    it("parse count of elements", () => {
+        clearJSDOM()
+        setupJSDOM(`
+            <ul>
+                <li>1</li>
+                <li>2</li>
+                <li>3</li>
+                <li>4</li>
+            </ul>
+        `)
+
+        const result = parseDOM({
+            type: "count",
+            selector: "ul li"
+        })
+        expect(result).equal(4)
+    })
+
+    it("parse count in array", () => {
+        clearJSDOM()
+        setupJSDOM(`
+            <div>
+                <div class="list">
+                    <ul>
+                        <li>1</li>
+                        <li>2</li>
+                        <li>3</li>
+                        <li>4</li>
+                    </ul>
+                </div>
+                <div class="list">
+                    <ul>
+                        <li>1</li>
+                        <li>2</li>
+                        <li>3</li>
+                    </ul>
+                </div>
+            </div>
+        `)
+
+        const result = parseDOM({
+            type: "array",
+            selector: ".list",
+            items: {
+                type: "count",
+                selector: "ul li"
+            },
+        })
+        console.log(result)
+        expect(result).to.be.deep.equal([4,3])
+    })
+
     it("parse simple string", () => {
         const result = parseDOM({
             type: "string",
