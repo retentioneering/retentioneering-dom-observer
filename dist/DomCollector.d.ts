@@ -14,9 +14,11 @@ export declare type DomCollectorTarget = {
     parseRootEl: string | HTMLElement;
     observeConfig?: MutationObserverInit;
     parseConfig: ParserConfig;
+    payload?: any;
 };
 declare type DomCollectorResult = {
     name: string;
+    payload?: any;
     parsedContent: any;
 };
 declare type Params = {

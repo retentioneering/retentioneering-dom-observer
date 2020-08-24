@@ -15,10 +15,12 @@ export type DomCollectorTarget = {
     parseRootEl: string | HTMLElement
     observeConfig?: MutationObserverInit
     parseConfig: ParserConfig
+    payload?: any
 }
 
 type DomCollectorResult = {
     name: string
+    payload?: any
     parsedContent: any
 }
 
@@ -68,6 +70,7 @@ export const createDomCollector = ({
                 const parsedContent = parseDOM(target.parseConfig, parseRootEl)
                 onCollect({
                     name: target.name,
+                    payload: target.payload,
                     parsedContent,
                 })
             }
