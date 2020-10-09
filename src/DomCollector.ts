@@ -21,7 +21,6 @@ export type DomCollectorTarget = {
 type DomCollectorResult = {
     name: string
     payload?: any
-    mapResult?: any => any
     parsedContent: any
 }
 
@@ -30,6 +29,7 @@ type Params = {
     onCollect: (result: DomCollectorResult) => void
     rootEl?: HTMLElement
     mainObserverCallback?: MainObserverCb
+    mapResult?: (parsedConten: any) => any
 }
 
 const DEFAULT_OBSERVER_CONFIG = {
@@ -46,8 +46,10 @@ export const createDomCollector = ({
     onCollect,
     rootEl,
     mainObserverCallback,
+    mapResult
 }: Params) => {
     const domObserver = new DomObserver(rootEl || document.body)
+    
     domObserver.start(mainObserverCallback)
     
     for (const target of targets) {
