@@ -72,7 +72,7 @@ export const createDomCollector = ({
                 onCollect({
                     name: target.name,
                     payload: target.payload,
-                    mapResult ? mapResult(parsedContent) : parsedContent,
+                    parsedContent: mapResult ? mapResult(parsedContent) : parsedContent,
                 })
             }
         }, observeDescriptor)
