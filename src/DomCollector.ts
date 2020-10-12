@@ -6,7 +6,7 @@
  * You can obtain License text at https://github.com/retentioneering/retentioneering-dom-observer/blob/master/LICENSE.md
  */
 import { DomObserver, MainObserverCb } from "./DomObserver"
-import { parseDOM, ParserConfig } from "./DomParser"
+import { parseDOM, ParserConfig, ParseDomResult } from "./DomParser"
 
 export type DomCollectorTarget = {
     name: string
@@ -29,7 +29,7 @@ type Params = {
     onCollect: (result: DomCollectorResult) => void
     rootEl?: HTMLElement
     mainObserverCallback?: MainObserverCb
-    mapResult?: (parsedConten: any) => any
+    mapResult?: (parsedContent: any) => any
 }
 
 const DEFAULT_OBSERVER_CONFIG = {
