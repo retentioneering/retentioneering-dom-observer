@@ -213,23 +213,6 @@ describe("DomCollector", () => {
             guardSelector: ".item",
             parseRootEl: "#cart",
             parseConfig,
-        }
-        // TODO: костыль. Разобраться почему вызывается
-        let doneCalled = false
-        const onCollect = sinon.spy(({ name, parsedContent }) => {
-            assert(name === "cart")
-            expect(parsedContent).to.be.deep.equal({
-                itemsCount: 1,
-            })
-            if (!doneCalled) done()
-            doneCalled = true
-        })
-        const mainObserverCallback = sinon.fake()
-        createDomCollector({
-            targets: [target],
-            rootEl: document.body,
-            onCollect,
-            mainObserverCallback,
             mapResult: (result) => {
                 expect(result).to.be.deep.equal({
                     cart: {
@@ -249,6 +232,23 @@ describe("DomCollector", () => {
                     itemsCount: result.cart.items.length,
                 }
             },
+        }
+        // TODO: костыль. Разобраться почему вызывается
+        let doneCalled = false
+        const onCollect = sinon.spy(({ name, parsedContent }) => {
+            assert(name === "cart")
+            expect(parsedContent).to.be.deep.equal({
+                itemsCount: 1,
+            })
+            if (!doneCalled) done()
+            doneCalled = true
+        })
+        const mainObserverCallback = sinon.fake()
+        createDomCollector({
+            targets: [target],
+            rootEl: document.body,
+            onCollect,
+            mainObserverCallback,
         })
         createCart()
         addItemToCart("Motherboard", "4000", "3400")
