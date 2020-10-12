@@ -16,6 +16,7 @@ export type DomCollectorTarget = {
     observeConfig?: MutationObserverInit
     parseConfig: ParserConfig
     payload?: any
+    mapResult?: (parsedContent: any) => any
 }
 
 type DomCollectorResult = {
@@ -29,7 +30,6 @@ type Params = {
     onCollect: (result: DomCollectorResult) => void
     rootEl?: HTMLElement
     mainObserverCallback?: MainObserverCb
-    mapResult?: (parsedContent: any) => any
 }
 
 const DEFAULT_OBSERVER_CONFIG = {
@@ -46,13 +46,14 @@ export const createDomCollector = ({
     onCollect,
     rootEl,
     mainObserverCallback,
-    mapResult
 }: Params) => {
     const domObserver = new DomObserver(rootEl || document.body)
     
     domObserver.start(mainObserverCallback)
     
     for (const target of targets) {
+        const { mapResult } = target
+
         const observeDescriptor = {
             name: target.name,
             selector: target.targetSelector,
