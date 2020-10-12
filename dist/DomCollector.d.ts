@@ -15,6 +15,7 @@ export declare type DomCollectorTarget = {
     observeConfig?: MutationObserverInit;
     parseConfig: ParserConfig;
     payload?: any;
+    mapResult?: (parsedContent: any) => any;
 };
 declare type DomCollectorResult = {
     name: string;
