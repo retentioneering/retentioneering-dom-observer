@@ -205,4 +205,52 @@ describe("DomCollector", () => {
             }, WAIT_TIMEOUT_MS)
         }, 100)
     })
+
+    it("map result", (done) => {
+        const target: DomCollectorTarget = {
+            name: "cart",
+            targetSelector: "#cart",
+            guardSelector: ".item",
+            parseRootEl: "#cart",
+            parseConfig,
+        }
+        // TODO: костыль. Разобраться почему вызывается
+        let doneCalled = false
+        const onCollect = sinon.spy(({ name, parsedContent }) => {
+            assert(name === "cart")
+            expect(parsedContent).to.be.deep.equal({
+                itemsCount: 1,
+            })
+            if (!doneCalled) done()
+            doneCalled = true
+        })
+        const mainObserverCallback = sinon.fake()
+        createDomCollector({
+            targets: [target],
+            rootEl: document.body,
+            onCollect,
+            mainObserverCallback,
+            mapResult: (result) => {
+                expect(result).to.be.deep.equal({
+                    cart: {
+                        order: "Order #1",
+                        total: "23400",
+                        items: [
+                            {
+                                name: "Motherboard",
+                                price: "4000",
+                                discount: "3400",
+                            },
+                        ],
+                    },
+                })
+
+                return {
+                    itemsCount: result.cart.items.length,
+                }
+            },
+        })
+        createCart()
+        addItemToCart("Motherboard", "4000", "3400")
+    })
 })

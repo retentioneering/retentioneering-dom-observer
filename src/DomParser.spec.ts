@@ -165,7 +165,6 @@ describe("DomParser", () => {
                 selector: "ul li"
             },
         })
-        console.log(result)
         expect(result).to.be.deep.equal([4,3])
     })
 
