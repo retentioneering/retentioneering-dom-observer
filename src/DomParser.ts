@@ -100,7 +100,8 @@ export function parseDOM(
         return Boolean(targetElement)
     }
     if (config.type === "array") {
-        const mathedElems = document.querySelectorAll<HTMLElement>(
+        const parentElement = rootElement || window.document
+        const mathedElems = parentElement.querySelectorAll<HTMLElement>(
             config.selector
         )
         if (config.items) {
