@@ -5,6 +5,7 @@
  * By using, sharing or editing this code you agree with the License terms and conditions.
  * You can obtain License text at https://github.com/retentioneering/retentioneering-dom-observer/blob/master/LICENSE.md
  */
+declare type ParseTarget = "textContent" | "value";
 declare type ParserConfigObject = {
     type: "object";
     keys: {
@@ -15,11 +16,13 @@ declare type ParserConfigObject = {
 declare type ParserConfigArray = {
     type: "array";
     selector: string;
+    parseFrom?: ParseTarget;
     items?: ParserConfig;
 };
 declare type ParserConfigString = {
     type: "string";
     selector?: string;
+    parseFrom?: ParseTarget;
 };
 declare type ParseConfigBoolean = {
     type: "boolean";
@@ -32,6 +35,7 @@ declare type ParseConfigCount = {
 declare type ParseConfigNumber = {
     type: "number";
     selector: string;
+    parseFrom?: ParseTarget;
     formatter: (value: string | null, el: HTMLElement | null) => number | null;
 };
 export declare type ParserConfig = ParserConfigObject | ParserConfigArray | ParserConfigString | ParseConfigBoolean | ParseConfigNumber | ParseConfigCount;

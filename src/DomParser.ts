@@ -5,6 +5,8 @@
  * By using, sharing or editing this code you agree with the License terms and conditions. 
  * You can obtain License text at https://github.com/retentioneering/retentioneering-dom-observer/blob/master/LICENSE.md
  */
+type ParseTarget = "textContent" | "value"
+
 type ParserConfigObject = {
     type: "object"
     keys: {
@@ -16,12 +18,14 @@ type ParserConfigObject = {
 type ParserConfigArray = {
     type: "array"
     selector: string
+    parseFrom?: ParseTarget
     items?: ParserConfig
 }
 
 type ParserConfigString = {
     type: "string"
     selector?: string
+    parseFrom?: ParseTarget
 }
 
 type ParseConfigBoolean = {
@@ -37,6 +41,7 @@ type ParseConfigCount = {
 type ParseConfigNumber = {
     type: "number"
     selector: string
+    parseFrom?: ParseTarget
     formatter: (value: string | null, el: HTMLElement | null) => number | null
 }
 
@@ -58,6 +63,20 @@ export type ParseDomResult =
         [key: string]: ParseDomResult
     }
 
+
+const parseText = (
+    el: HTMLElement | Document,
+    parseFrom?: ParseTarget
+) => {
+    if (!parseFrom || (parseFrom === "textContent")) {
+        return el.textContent
+    }
+    if (parseFrom === "value" && el instanceof HTMLElement) {
+        return el.getAttribute("value")
+    }
+    return null
+}
+
 /**
  * Parse a specific structure from the DOM recursively
  * @param  config - configuration object that describes the type of the resulting object and how to get it from the DOM
@@ -71,16 +90,18 @@ export function parseDOM(
     if (config.type === "string") {
         const parentElement = rootElement || window.document
         if (!config.selector) {
-            return parentElement.textContent
+            return parseText(parentElement, config.parseFrom)
         }
         const targetElement = parentElement.querySelector<HTMLElement>(
             config.selector
         )
-        return targetElement ? targetElement.textContent : null
+        return targetElement ? parseText(targetElement, config.parseFrom) : null
     }
     if (config.type === "count") {
         const parentElement = rootElement || window.document
-        const targetElements = parentElement.querySelectorAll<HTMLElement>(config.selector)
+        const targetElements = parentElement.querySelectorAll<HTMLElement>(
+            config.selector
+        )
         return targetElements.length
     }
     if (config.type === "number") {
@@ -88,7 +109,8 @@ export function parseDOM(
         const targetElement = parentElement.querySelector<HTMLElement>(
             config.selector
         )
-        const value = targetElement ? targetElement.textContent : null
+        const value = targetElement
+            ? parseText(targetElement, config.parseFrom) : null
         return config.formatter(value, targetElement)
     }
 
@@ -111,7 +133,9 @@ export function parseDOM(
             }
             return values
         } else {
-            return [...mathedElems].map((el: HTMLElement) => el.textContent)
+            return [...mathedElems].map(
+                (el: HTMLElement) => parseText(el, config.parseFrom)
+            )
         }
     }
     if (config.type === "object") {
