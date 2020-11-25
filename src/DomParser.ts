@@ -5,7 +5,7 @@
  * By using, sharing or editing this code you agree with the License terms and conditions. 
  * You can obtain License text at https://github.com/retentioneering/retentioneering-dom-observer/blob/master/LICENSE.md
  */
-type ParseTarget = "textContent" | "value"
+type ParseTarget = "textContent" | string
 
 type ParserConfigObject = {
     type: "object"
@@ -71,8 +71,8 @@ const parseText = (
     if (!parseFrom || (parseFrom === "textContent")) {
         return el.textContent
     }
-    if (parseFrom === "value" && el instanceof HTMLElement) {
-        return el.getAttribute("value")
+    if (typeof parseFrom === "string" && el instanceof HTMLElement) {
+        return el.getAttribute(parseFrom)
     }
     return null
 }
