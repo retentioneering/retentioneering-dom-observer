@@ -5,7 +5,7 @@
  * By using, sharing or editing this code you agree with the License terms and conditions.
  * You can obtain License text at https://github.com/retentioneering/retentioneering-dom-observer/blob/master/LICENSE.md
  */
-declare type ParseTarget = "textContent" | "value";
+declare type ParseTarget = "textContent" | string;
 declare type ParserConfigObject = {
     type: "object";
     keys: {
