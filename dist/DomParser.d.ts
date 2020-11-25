@@ -23,6 +23,7 @@ declare type ParserConfigString = {
     type: "string";
     selector?: string;
     parseFrom?: ParseTarget;
+    formatter?: (value: string | null, el: HTMLElement | null) => any;
 };
 declare type ParseConfigBoolean = {
     type: "boolean";

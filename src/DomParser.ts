@@ -26,6 +26,7 @@ type ParserConfigString = {
     type: "string"
     selector?: string
     parseFrom?: ParseTarget
+    formatter?: (value: string | null, el: HTMLElement | null) => any
 }
 
 type ParseConfigBoolean = {
@@ -95,7 +96,10 @@ export function parseDOM(
         const targetElement = parentElement.querySelector<HTMLElement>(
             config.selector
         )
-        return targetElement ? parseText(targetElement, config.parseFrom) : null
+        const value =  targetElement
+            ? parseText(targetElement, config.parseFrom)
+            : null
+        return config.formatter ? config.formatter(value, targetElement) : value
     }
     if (config.type === "count") {
         const parentElement = rootElement || window.document
