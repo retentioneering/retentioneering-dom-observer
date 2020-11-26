@@ -11,6 +11,10 @@ declare type TargetElementDescriptor = {
     selector: string;
     observerConfig?: MutationObserverInit;
 };
+declare type ObservedElement = {
+    element: HTMLElement;
+    descriptor: TargetElementDescriptor;
+};
 export declare const FOUND_EVENT_NAME = "target-element-found";
 export declare const MUTATED_EVENT_NAME = "target-element-mutated";
 export declare type FoundEvent = {
@@ -42,7 +46,7 @@ export declare class DomObserver extends EventEmitter {
     private _clearObservedElementsByMutation;
     private _clearObservedElementsByDescriptor;
     constructor(_rootElement?: HTMLElement);
-    get observedElements(): HTMLElement[];
+    get observedElements(): ObservedElement[];
     start(cb?: MainObserverCb): this;
     stop(): this;
     subscribe(cb: SubscribeCb, descriptor?: TargetElementDescriptor): () => void;

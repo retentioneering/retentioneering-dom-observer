@@ -188,4 +188,45 @@ describe("DomObserver", () => {
             done()
         }, WAIT_TIMEOUT_MS)
     })
+
+    it("multiple observer on same element", (done) => {
+        const app = findAppOrFail()
+        const domObserver = new DomObserver().start()
+        let foundEventsCount = 0
+        let mutateEventsCount = 0
+        const observersLog: string[] = []
+
+        const cb = sinon.fake()
+        domObserver.subscribe(({ descriptor, type }) => {
+            if (type === FOUND_EVENT_NAME) {
+                foundEventsCount += 1
+            }
+            if (type === MUTATED_EVENT_NAME) {
+                mutateEventsCount += 1
+            }
+            observersLog.push(descriptor.name)
+            cb()
+        })
+
+        domObserver.observe({
+            name: "appContainer1",
+            selector: "#app",
+            observerConfig,
+        })
+        domObserver.observe({
+            name: "appContainer2",
+            selector: "#app",
+            observerConfig,
+        })
+        appendElement(app, "div")
+        setTimeout(() => {
+            assert(cb.callCount === 4)
+            assert(foundEventsCount === 2)
+            assert(mutateEventsCount === 2)
+            assert(observersLog.includes("appContainer1"))
+            assert(observersLog.includes("appContainer2"))
+            done()
+        }, WAIT_TIMEOUT_MS)
+
+    })
 })

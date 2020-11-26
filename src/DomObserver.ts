@@ -27,6 +27,11 @@ type TargetElementsObserver = {
     observers: MutationObserver[]
 }
 
+type ObservedElement = {
+    element: HTMLElement
+    descriptor: TargetElementDescriptor
+}
+
 export const FOUND_EVENT_NAME = "target-element-found"
 export const MUTATED_EVENT_NAME = "target-element-mutated"
 
@@ -50,7 +55,7 @@ type SubscribeCb = (e: ObserveDomEvent) => void
 
 export class DomObserver extends EventEmitter {
     private _mainObserver: MutationObserver | null = null
-    private _observedElements: HTMLElement[] = []
+    private _observedElements: ObservedElement[] = []
     private _targetElementsObservers: TargetElementsObserver[] = []
     private _targetElementsDescriptors: TargetElementDescriptor[] = []
     private _checkTargetSelectorAndObserve(
@@ -97,10 +102,16 @@ export class DomObserver extends EventEmitter {
             this._onTargetElementMutated(mutations, descriptor)
         )
         for (const elem of elems) {
-            // already observed
-            if (this._observedElements.includes(elem)) continue
-            this._observedElements.push(elem)
-            const html = elem.innerHTML
+            const alreadyObserved = this._observedElements.some(
+                ({ descriptor: foundDescriptor, element }) => {
+                    return descriptor.name === foundDescriptor.name && element === elem
+                }
+            )
+            if (alreadyObserved) continue
+            this._observedElements.push({
+                element: elem,
+                descriptor,
+            })
             this._dispatchFoundEvent(descriptor, elem)
             observer.observe(elem, descriptor.observerConfig)
         }
@@ -163,8 +174,8 @@ export class DomObserver extends EventEmitter {
     }
     private _clearObservedElementsByMutation(mutation: MutationRecord) {
         this._observedElements = this._observedElements.filter(
-            (obvservedNode) => {
-                return ![...mutation.removedNodes].includes(obvservedNode)
+            ({ element }) => {
+                return ![...mutation.removedNodes].includes(element)
             }
         )
     }
@@ -172,8 +183,8 @@ export class DomObserver extends EventEmitter {
         descriptor: TargetElementDescriptor
     ) {
         this._observedElements = this._observedElements.filter(
-            (observedNode) => {
-                return !observedNode.matches(descriptor.selector)
+            ({ descriptor: foundDescriptor }) => {
+                return descriptor.name !== foundDescriptor.name
             }
         )
     }
