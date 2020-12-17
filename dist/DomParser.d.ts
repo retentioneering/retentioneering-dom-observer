@@ -35,9 +35,9 @@ declare type ParseConfigCount = {
 };
 declare type ParseConfigNumber = {
     type: "number";
-    selector: string;
+    selector?: string;
     parseFrom?: ParseTarget;
-    formatter: (value: string | null, el: HTMLElement | null) => number | null;
+    formatter: (value: string | null, el: HTMLElement | Document | null) => number | null;
 };
 export declare type ParserConfig = ParserConfigObject | ParserConfigArray | ParserConfigString | ParseConfigBoolean | ParseConfigNumber | ParseConfigCount;
 export declare type ParseDomResult = string | null | boolean | number | Array<ParseDomResult> | {

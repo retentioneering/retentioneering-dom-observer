@@ -41,9 +41,9 @@ type ParseConfigCount = {
 
 type ParseConfigNumber = {
     type: "number"
-    selector: string
+    selector?: string
     parseFrom?: ParseTarget
-    formatter: (value: string | null, el: HTMLElement | null) => number | null
+    formatter: (value: string | null, el: HTMLElement | Document | null) => number | null
 }
 
 export type ParserConfig =
@@ -110,6 +110,10 @@ export function parseDOM(
     }
     if (config.type === "number") {
         const parentElement = rootElement || window.document
+        if (!config.selector) {
+            const value = parseText(parentElement, config.parseFrom)
+            return config.formatter(value, parentElement)
+        }
         const targetElement = parentElement.querySelector<HTMLElement>(
             config.selector
         )
