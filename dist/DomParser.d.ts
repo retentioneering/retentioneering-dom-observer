@@ -28,6 +28,7 @@ declare type ParserConfigString = {
 declare type ParseConfigBoolean = {
     type: "boolean";
     selector: string;
+    inverse?: boolean;
 };
 declare type ParseConfigCount = {
     type: "count";

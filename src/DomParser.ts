@@ -32,6 +32,7 @@ type ParserConfigString = {
 type ParseConfigBoolean = {
     type: "boolean"
     selector: string
+    inverse?: boolean
 }
 
 type ParseConfigCount = {
@@ -43,7 +44,9 @@ type ParseConfigNumber = {
     type: "number"
     selector?: string
     parseFrom?: ParseTarget
-    formatter: (value: string | null, el: HTMLElement | Document | null) => number | null
+    formatter: (
+        value: string | null, el: HTMLElement | Document | null
+    ) => number | null
 }
 
 export type ParserConfig =
@@ -127,7 +130,8 @@ export function parseDOM(
         const targetElement = parentElement.querySelector<HTMLElement>(
             config.selector
         )
-        return Boolean(targetElement)
+        const targetElementExists = Boolean(targetElement)
+        return !config.inverse ? targetElementExists : !targetElementExists
     }
     if (config.type === "array") {
         const parentElement = rootElement || window.document
