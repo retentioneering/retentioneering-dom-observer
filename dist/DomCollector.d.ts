@@ -11,6 +11,7 @@ export declare type DomCollectorTarget = {
     name: string;
     targetSelector: string;
     guardSelector?: string;
+    childGuardSelector?: string;
     parseRootEl: string | HTMLElement;
     observeConfig?: MutationObserverInit;
     parseConfig: ParserConfig;

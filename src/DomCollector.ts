@@ -12,6 +12,7 @@ export type DomCollectorTarget = {
     name: string
     targetSelector: string
     guardSelector?: string
+    childGuardSelector?: string
     parseRootEl: string | HTMLElement
     observeConfig?: MutationObserverInit
     parseConfig: ParserConfig
@@ -60,7 +61,7 @@ export const createDomCollector = ({
             observerConfig: target.observeConfig || DEFAULT_OBSERVER_CONFIG,
         }
         domObserver.subscribe((e) => {
-            const { guardSelector } = target
+            const { guardSelector, childGuardSelector } = target
             if (!guardSelector || document.querySelector(guardSelector)) {
                 const parseRootEl =
                     typeof target.parseRootEl === "string"
@@ -71,11 +72,19 @@ export const createDomCollector = ({
                 if (!parseRootEl) {
                     return
                 }
+
+                if (childGuardSelector 
+                    && !parseRootEl.querySelector(childGuardSelector)) {
+                    return
+                }
+
                 const parsedContent = parseDOM(target.parseConfig, parseRootEl)
                 onCollect({
                     name: target.name,
                     payload: target.payload,
-                    parsedContent: mapResult ? mapResult(parsedContent) : parsedContent,
+                    parsedContent: mapResult
+                        ? mapResult(parsedContent)
+                        : parsedContent,
                 })
             }
         }, observeDescriptor)
