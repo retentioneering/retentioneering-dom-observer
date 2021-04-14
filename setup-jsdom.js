@@ -2,13 +2,17 @@
 const { JSDOM } = require("jsdom")
 
 global.setupJSDOM = (html, config = {}) => {
+
     const dom = new JSDOM(html, {
         url: "http://localhost",
         ...config
     })
 
+
+
     global.document = dom.window.document
     global.window = document.defaultView
+    global.Element = window.Element
     window.console = global.console
 
 

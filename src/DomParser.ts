@@ -26,7 +26,7 @@ type ParserConfigString = {
     type: "string"
     selector?: string
     parseFrom?: ParseTarget
-    formatter?: (value: string | null, el: HTMLElement | null) => any
+    formatter?: (value: string | null, el: Element | null) => any
 }
 
 type ParseConfigBoolean = {
@@ -45,7 +45,7 @@ type ParseConfigNumber = {
     selector?: string
     parseFrom?: ParseTarget
     formatter: (
-        value: string | null, el: HTMLElement | Document | null
+        value: string | null, el: Element | Document | null
     ) => number | null
 }
 
@@ -69,13 +69,13 @@ export type ParseDomResult =
 
 
 const parseText = (
-    el: HTMLElement | Document,
+    el: Element | Document,
     parseFrom?: ParseTarget
 ) => {
     if (!parseFrom || (parseFrom === "textContent")) {
         return el.textContent
     }
-    if (typeof parseFrom === "string" && el instanceof HTMLElement) {
+    if (typeof parseFrom === "string" && el instanceof Element) {
         return el.getAttribute(parseFrom)
     }
     return null
@@ -89,14 +89,14 @@ const parseText = (
  */
 export function parseDOM(
     config: ParserConfig,
-    rootElement?: HTMLElement
+    rootElement?: Element
 ): ParseDomResult {
     if (config.type === "string") {
         const parentElement = rootElement || window.document
         if (!config.selector) {
             return parseText(parentElement, config.parseFrom)
         }
-        const targetElement = parentElement.querySelector<HTMLElement>(
+        const targetElement = parentElement.querySelector<Element>(
             config.selector
         )
         const value =  targetElement
@@ -106,7 +106,7 @@ export function parseDOM(
     }
     if (config.type === "count") {
         const parentElement = rootElement || window.document
-        const targetElements = parentElement.querySelectorAll<HTMLElement>(
+        const targetElements = parentElement.querySelectorAll<Element>(
             config.selector
         )
         return targetElements.length
@@ -117,7 +117,7 @@ export function parseDOM(
             const value = parseText(parentElement, config.parseFrom)
             return config.formatter(value, parentElement)
         }
-        const targetElement = parentElement.querySelector<HTMLElement>(
+        const targetElement = parentElement.querySelector<Element>(
             config.selector
         )
         const value = targetElement
@@ -127,7 +127,7 @@ export function parseDOM(
 
     if (config.type === "boolean") {
         const parentElement = rootElement || window.document
-        const targetElement = parentElement.querySelector<HTMLElement>(
+        const targetElement = parentElement.querySelector<Element>(
             config.selector
         )
         const targetElementExists = Boolean(targetElement)
@@ -135,7 +135,7 @@ export function parseDOM(
     }
     if (config.type === "array") {
         const parentElement = rootElement || window.document
-        const mathedElems = parentElement.querySelectorAll<HTMLElement>(
+        const mathedElems = parentElement.querySelectorAll<Element>(
             config.selector
         )
         if (config.items) {
@@ -146,7 +146,7 @@ export function parseDOM(
             return values
         } else {
             return [...mathedElems].map(
-                (el: HTMLElement) => parseText(el, config.parseFrom)
+                (el: Element) => parseText(el, config.parseFrom)
             )
         }
     }

@@ -22,15 +22,16 @@ type TargetElementDescriptor = {
     observerConfig?: MutationObserverInit
 }
 
-type TargetElementsObserver = {
-    descriptor: TargetElementDescriptor
-    observers: MutationObserver[]
+type ObservedElement = {
+    element: Element
+    observer: MutationObserver
 }
 
-type ObservedElement = {
-    element: HTMLElement
+type TargetElementsObserver = {
     descriptor: TargetElementDescriptor
+    observedElements: ObservedElement[]
 }
+
 
 export const FOUND_EVENT_NAME = "target-element-found"
 export const MUTATED_EVENT_NAME = "target-element-mutated"
@@ -38,13 +39,14 @@ export const MUTATED_EVENT_NAME = "target-element-mutated"
 export type FoundEvent = {
     type: typeof FOUND_EVENT_NAME
     descriptor: TargetElementDescriptor
-    element: HTMLElement
+    element: Element
 }
 
 export type MutatedEvent = {
     type: typeof MUTATED_EVENT_NAME
     descriptor: TargetElementDescriptor
     mutations: MutationRecord[]
+    element: Element
 }
 
 export type ObserveDomEvent = FoundEvent | MutatedEvent
@@ -55,18 +57,18 @@ type SubscribeCb = (e: ObserveDomEvent) => void
 
 export class DomObserver extends EventEmitter {
     private _mainObserver: MutationObserver | null = null
-    private _observedElements: ObservedElement[] = []
     private _targetElementsObservers: TargetElementsObserver[] = []
     private _targetElementsDescriptors: TargetElementDescriptor[] = []
     private _checkTargetSelectorAndObserve(
         descriptor: TargetElementDescriptor,
-        el: HTMLElement,
+        el: Element,
         mutationsList: MutationRecord[],
     ) {
-        const targetElements = el.matches(descriptor.selector)
-            ? [el]
-            : [...el.querySelectorAll<HTMLElement>(descriptor.selector)]
-
+        const targetElements = [...el.querySelectorAll<Element>(descriptor.selector)]
+        if (el.matches(descriptor.selector)) {
+            targetElements.push(el)
+        }
+    
         if (!targetElements.length) {
             return
         }
@@ -74,66 +76,86 @@ export class DomObserver extends EventEmitter {
         this._observeTargetElements(targetElements, descriptor)
 
         // check if the mutation of the target node is in the mutations list
-        const matchedMutations = this._matchTargetElementMutations(
+        const targetElementsWithMutations = this._matchTargetElementMutations(
             descriptor,
             mutationsList
         )
-        if (matchedMutations.length) {
-            this._dispatchMutatedEvent(matchedMutations, descriptor)
+        for (const { target, mutations } of targetElementsWithMutations) {
+            this._dispatchMutatedEvent(target, mutations, descriptor)
         }
     }
     private _matchTargetElementMutations(
         descriptor: TargetElementDescriptor,
         mutationsList: MutationRecord[]
     ) {
-        const matchedMutations = []
+        type TargetElementMutations = {
+            target: Element
+            mutations: MutationRecord[]
+        }
+
+        const targetElementsMutations: TargetElementMutations[] = []
+
         for (const mutation of mutationsList) {
-            if ((mutation.target as HTMLElement).closest(descriptor.selector)) {
-                matchedMutations.push(mutation)
+            if (!(mutation.target instanceof Element)) continue
+            const target = mutation.target.closest(descriptor.selector)
+            if (!target) continue
+            const existing = targetElementsMutations.find(
+                (found) => found.target === target
+            )
+            if (existing) {
+                existing.mutations.push(mutation)
+            } else {
+                targetElementsMutations.push({
+                    target,
+                    mutations: [mutation],
+                })
             }
         }
-        return matchedMutations
+        return targetElementsMutations
     }
     private _observeTargetElements(
-        elems: HTMLElement[],
+        elems: Element[],
         descriptor: TargetElementDescriptor
     ) {
-        const observer = new window.MutationObserver(mutations =>
-            this._onTargetElementMutated(mutations, descriptor)
-        )
+        const existing = this._targetElementsObservers.find((found) => {
+            return found.descriptor === descriptor
+        })
+
+        const targetElementObservers: TargetElementsObserver = existing || {
+            descriptor,
+            observedElements: [],
+        }
+
+        if (!existing) {
+            this._targetElementsObservers.push(targetElementObservers)
+        }
+
         for (const elem of elems) {
-            const alreadyObserved = this._observedElements.some(
-                ({ descriptor: foundDescriptor, element }) => {
-                    return descriptor.name === foundDescriptor.name && element === elem
-                }
-            )
-            if (alreadyObserved) continue
-            this._observedElements.push({
-                element: elem,
-                descriptor,
+            const alreadyObserved = targetElementObservers.observedElements.some(({ element }) => {
+                return element === elem
             })
+            if (alreadyObserved) continue
+
+            const observer = new window.MutationObserver(mutations =>
+                this._onTargetElementMutated(elem, mutations, descriptor)
+            )
             this._dispatchFoundEvent(descriptor, elem)
             observer.observe(elem, descriptor.observerConfig)
-        }
-        const existingObserverItem = this._targetElementsObservers.find(
-            found => found.descriptor.name === descriptor.name
-        )
-        if (existingObserverItem) {
-            existingObserverItem.observers.push(observer)
-        } else {
-            this._targetElementsObservers.push({
-                descriptor,
-                observers: [observer],
+            targetElementObservers.observedElements.push({
+                element: elem,
+                observer,
             })
         }
     }
     private _onTargetElementMutated(
+        element: Element,
         mutations: MutationRecord[],
         descriptor: TargetElementDescriptor
     ) {
-        this._dispatchMutatedEvent(mutations, descriptor)
+        this._dispatchMutatedEvent(element, mutations, descriptor)
     }
     private _dispatchMutatedEvent(
+        element: Element,
         mutations: MutationRecord[],
         descriptor: TargetElementDescriptor
     ) {
@@ -141,12 +163,13 @@ export class DomObserver extends EventEmitter {
             type: MUTATED_EVENT_NAME,
             descriptor,
             mutations,
+            element,
         }
         this.dispatch("target-element-mutated", payload)
     }
     private _dispatchFoundEvent(
         descriptor: TargetElementDescriptor,
-        element: HTMLElement
+        element: Element
     ) {
         const payload: FoundEvent = {
             type: FOUND_EVENT_NAME,
@@ -159,7 +182,7 @@ export class DomObserver extends EventEmitter {
         for (const mutation of mutationsList) {
             if (mutation.type !== "childList") continue
             for (const node of mutation.addedNodes) {
-                if (!(node instanceof window.HTMLElement)) continue
+                if (!(node instanceof window.Element)) continue
                 for (const descriptor of this._targetElementsDescriptors) {
                     this._checkTargetSelectorAndObserve(
                         descriptor,
@@ -173,27 +196,73 @@ export class DomObserver extends EventEmitter {
         }
     }
     private _clearObservedElementsByMutation(mutation: MutationRecord) {
-        this._observedElements = this._observedElements.filter(
-            ({ element }) => {
-                return ![...mutation.removedNodes].includes(element)
+        if (!mutation.removedNodes || !mutation.removedNodes.length) {
+            return
+        }
+
+        for (const { descriptor, observedElements } of this._targetElementsObservers) {
+            for (let i = 0; i < observedElements.length; i++) {
+                const { element, observer } = observedElements[i]
+                if ([...mutation.removedNodes].includes(element)) {
+                    const unhandledRecords = observer.takeRecords()
+                    if (unhandledRecords.length) {
+                        this._onTargetElementMutated(
+                            element,
+                            unhandledRecords,
+                            descriptor
+                        )
+                    }
+                    observer.disconnect()
+                    observedElements.splice(i, 1)
+                    i--
+                }
             }
-        )
+        }
+
+        for (let i = 0; i < this._targetElementsObservers.length; i++) {
+            const curr = this._targetElementsObservers[i]
+            if (!curr.observedElements.length) {
+                this._targetElementsObservers.splice(i, 1)
+                i--
+            }
+        }
     }
+
     private _clearObservedElementsByDescriptor(
         descriptor: TargetElementDescriptor
     ) {
-        this._observedElements = this._observedElements.filter(
-            ({ descriptor: foundDescriptor }) => {
-                return descriptor.name !== foundDescriptor.name
+        const existingIndex = this._targetElementsObservers.findIndex((found) => {
+            return found.descriptor === descriptor
+        })
+
+        if (existingIndex === -1) return
+
+        const { observedElements } = this._targetElementsObservers[existingIndex]
+
+        // stop all observers
+        for (let i = 0; i < observedElements.length; i++) {
+            const { element, observer } = observedElements[i]
+            const unhandledRecords = observer.takeRecords()
+            if (unhandledRecords.length) {
+                this._onTargetElementMutated(
+                    element,
+                    unhandledRecords,
+                    descriptor
+                )
             }
-        )
+            observer.disconnect()
+            observedElements.splice(i, 1)
+            i--
+        }
     }
-    constructor(private _rootElement: HTMLElement = document.body) {
+    constructor(private _rootElement: Element = document.body) {
         super()
     }
-    get observedElements() {
-        return [...this._observedElements]
+
+    get observed() {
+        return this._targetElementsObservers   
     }
+
     public start(cb?: MainObserverCb) {
         this._mainObserver = new window.MutationObserver(mutations => {
             this._onRootElementMutated(mutations)
@@ -238,20 +307,10 @@ export class DomObserver extends EventEmitter {
             this._clearObservedElementsByDescriptor(
                 targetElementObserver.descriptor
             )
-
-            for (const mObserver of targetElementObserver.observers) {
-                const unhandledRecords = mObserver.takeRecords()
-                if (unhandledRecords.length) {
-                    this._onTargetElementMutated(
-                        unhandledRecords,
-                        targetElementObserver.descriptor
-                    )
-                }
-                mObserver.disconnect()
-            }
             this._targetElementsObservers.splice(i, 1)
             i--
         }
+    
         if (!name) {
             this._targetElementsDescriptors = []
             return this
@@ -266,7 +325,7 @@ export class DomObserver extends EventEmitter {
         this._targetElementsDescriptors.push(descriptor)
         // element already exists
         const targetElements = [
-            ...this._rootElement.querySelectorAll<HTMLElement>(
+            ...this._rootElement.querySelectorAll<Element>(
                 descriptor.selector
             ),
         ]

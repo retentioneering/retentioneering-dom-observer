@@ -28,7 +28,7 @@ describe("DomCollector", () => {
 
 
     const findAppOrFail = () => {
-        const app = document.body.querySelector<HTMLElement>("#app")
+        const app = document.body.querySelector<Element>("#app")
         if (!app) {
             return assert.fail("invalid dom")
         }

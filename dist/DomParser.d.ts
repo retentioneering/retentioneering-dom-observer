@@ -23,7 +23,7 @@ declare type ParserConfigString = {
     type: "string";
     selector?: string;
     parseFrom?: ParseTarget;
-    formatter?: (value: string | null, el: HTMLElement | null) => any;
+    formatter?: (value: string | null, el: Element | null) => any;
 };
 declare type ParseConfigBoolean = {
     type: "boolean";
@@ -38,7 +38,7 @@ declare type ParseConfigNumber = {
     type: "number";
     selector?: string;
     parseFrom?: ParseTarget;
-    formatter: (value: string | null, el: HTMLElement | Document | null) => number | null;
+    formatter: (value: string | null, el: Element | Document | null) => number | null;
 };
 export declare type ParserConfig = ParserConfigObject | ParserConfigArray | ParserConfigString | ParseConfigBoolean | ParseConfigNumber | ParseConfigCount;
 export declare type ParseDomResult = string | null | boolean | number | Array<ParseDomResult> | {
@@ -50,5 +50,5 @@ export declare type ParseDomResult = string | null | boolean | number | Array<Pa
  * @param  rootElement - root DOM element. will be parsed inside the children of this element
  * @return result of parsing
  */
-export declare function parseDOM(config: ParserConfig, rootElement?: HTMLElement): ParseDomResult;
+export declare function parseDOM(config: ParserConfig, rootElement?: Element): ParseDomResult;
 export {};

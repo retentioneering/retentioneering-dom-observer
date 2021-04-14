@@ -42,7 +42,7 @@ describe("DomObserver", () => {
     const randomInteger = (n: number) => Math.floor(Math.random() * n) + 1
 
     const findAppOrFail = () => {
-        const app = document.body.querySelector<HTMLElement>("#app")
+        const app = document.body.querySelector<Element>("#app")
         if (!app) {
             return assert.fail("invalid dom")
         }
@@ -50,7 +50,7 @@ describe("DomObserver", () => {
     }
 
     const appendElement = (
-        parent: HTMLElement,
+        parent: Element,
         tagName: string,
         id?: string
     ) => {
@@ -120,7 +120,7 @@ describe("DomObserver", () => {
         const cb = sinon.fake()
         domObserver.subscribe(cb)
         domObserver.stopObservation("appContainer")
-        assert(domObserver.observedElements.length === 0)
+        assert(domObserver.observed.length === 0)
         appendElement(app, "div")
         setTimeout(() => {
             assert(!cb.called, "unexpected subscribe cb call")
@@ -139,10 +139,10 @@ describe("DomObserver", () => {
         let targetElementRemoved = false
         domObserver.start(() => {
             if (targetElementRemoved) {
-                assert(domObserver.observedElements.length === 0)
+                assert(domObserver.observed.length === 0)
                 done()
             } else {
-                assert(domObserver.observedElements.length === 1)
+                assert(domObserver.observed.length === 1)
             }
         })
         const child = appendElement(app, "div", "target")

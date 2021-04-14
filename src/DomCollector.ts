@@ -13,8 +13,8 @@ export type DomCollectorTarget = {
     targetSelector: string
     guardSelector?: string
     childGuardSelector?: string
-    guard?: (rootElement: HTMLElement) => boolean
-    parseRootEl: string | HTMLElement
+    guard?: (rootElement: Element) => boolean
+    parseRootEl?: string | Element
     observeConfig?: MutationObserverInit
     parseConfig: ParserConfig
     payload?: any
@@ -30,7 +30,7 @@ type DomCollectorResult = {
 type Params = {
     targets: DomCollectorTarget[]
     onCollect: (result: DomCollectorResult) => void
-    rootEl?: HTMLElement
+    rootEl?: Element
     mainObserverCallback?: MainObserverCb
 }
 
@@ -62,17 +62,25 @@ export const createDomCollector = ({
             observerConfig: target.observeConfig || DEFAULT_OBSERVER_CONFIG,
         }
         domObserver.subscribe((e) => {
+            const { element } = e
             const { guardSelector, childGuardSelector, guard } = target
             if (!guardSelector || document.querySelector(guardSelector)) {
-                const parseRootEl =
-                    typeof target.parseRootEl === "string"
-                        ? document.querySelector<HTMLElement>(
-                            target.parseRootEl
-                        )
-                        : target.parseRootEl
+                let parseRootEl: Element | undefined | null
+                if (target.parseRootEl) {
+                    parseRootEl =
+                        typeof target.parseRootEl === "string"
+                            ? document.querySelector<Element>(
+                                target.parseRootEl
+                            )
+                            : target.parseRootEl
+                } else {
+                    parseRootEl = element
+                }
+
                 if (!parseRootEl) {
                     return
                 }
+
 
                 if (childGuardSelector 
                     && !parseRootEl.querySelector(childGuardSelector)) {

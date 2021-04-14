@@ -94,7 +94,7 @@ describe("DomParser", () => {
                         type: "number",
                         selector: ".b-reviews-offer-block .rating-universal-svg__fill",
                         formatter: (v, el) => {
-                            if (el && el instanceof window.HTMLElement) {
+                            if (el && el instanceof window.Element) {
                                 for (const className of el.classList) {
                                     if (/_rate\d+$/.test(className)) {
                                         const mathed = className.match(/\d+/)

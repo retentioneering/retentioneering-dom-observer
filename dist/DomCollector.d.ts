@@ -12,8 +12,8 @@ export declare type DomCollectorTarget = {
     targetSelector: string;
     guardSelector?: string;
     childGuardSelector?: string;
-    guard?: (rootElement: HTMLElement) => boolean;
-    parseRootEl: string | HTMLElement;
+    guard?: (rootElement: Element) => boolean;
+    parseRootEl?: string | Element;
     observeConfig?: MutationObserverInit;
     parseConfig: ParserConfig;
     payload?: any;
@@ -27,7 +27,7 @@ declare type DomCollectorResult = {
 declare type Params = {
     targets: DomCollectorTarget[];
     onCollect: (result: DomCollectorResult) => void;
-    rootEl?: HTMLElement;
+    rootEl?: Element;
     mainObserverCallback?: MainObserverCb;
 };
 export declare const createDomCollector: ({ targets, onCollect, rootEl, mainObserverCallback, }: Params) => DomObserver;
