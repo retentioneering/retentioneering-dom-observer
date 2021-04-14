@@ -5,7 +5,7 @@
  * By using, sharing or editing this code you agree with the License terms and conditions. 
  * You can obtain License text at https://github.com/retentioneering/retentioneering-dom-observer/blob/master/LICENSE.md
  */
-import { DomObserver, MainObserverCb } from "./DomObserver"
+import { DomObserver, MainObserverCb, ObserveDomEvent } from "./DomObserver"
 import { parseDOM, ParserConfig, ParseDomResult } from "./DomParser"
 
 export type DomCollectorTarget = {
@@ -24,6 +24,7 @@ export type DomCollectorTarget = {
 type DomCollectorResult = {
     name: string
     payload?: any
+    originalEvent?: ObserveDomEvent
     parsedContent: any
 }
 
@@ -95,6 +96,7 @@ export const createDomCollector = ({
                 onCollect({
                     name: target.name,
                     payload: target.payload,
+                    originalEvent: e,
                     parsedContent: mapResult
                         ? mapResult(parsedContent)
                         : parsedContent,

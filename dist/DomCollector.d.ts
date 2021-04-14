@@ -5,7 +5,7 @@
  * By using, sharing or editing this code you agree with the License terms and conditions.
  * You can obtain License text at https://github.com/retentioneering/retentioneering-dom-observer/blob/master/LICENSE.md
  */
-import { DomObserver, MainObserverCb } from "./DomObserver";
+import { DomObserver, MainObserverCb, ObserveDomEvent } from "./DomObserver";
 import { ParserConfig } from "./DomParser";
 export declare type DomCollectorTarget = {
     name: string;
@@ -22,6 +22,7 @@ export declare type DomCollectorTarget = {
 declare type DomCollectorResult = {
     name: string;
     payload?: any;
+    originalEvent?: ObserveDomEvent;
     parsedContent: any;
 };
 declare type Params = {
