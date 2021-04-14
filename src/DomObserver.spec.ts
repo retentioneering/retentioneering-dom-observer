@@ -11,6 +11,8 @@ import sinon from "sinon"
 import {
     DomObserver,
     ObserveDomEvent,
+    FoundEvent,
+    MutatedEvent,
     FOUND_EVENT_NAME,
     MUTATED_EVENT_NAME,
 } from "./DomObserver"
@@ -228,5 +230,36 @@ describe("DomObserver", () => {
             done()
         }, WAIT_TIMEOUT_MS)
 
+    })
+
+    it("check target element on mutated event", (done) => {
+        const app = findAppOrFail()
+        const domObserver = new DomObserver().start()
+
+        const foundEvents: FoundEvent[] = []
+        const mutatedEvents: MutatedEvent[] = []
+
+        domObserver.subscribe((e) => {
+            if (e.type === FOUND_EVENT_NAME) {
+                foundEvents.push(e)
+            }
+            if (e.type === MUTATED_EVENT_NAME) {
+                mutatedEvents.push(e)
+            }
+
+            if (foundEvents.length && mutatedEvents.length) {
+                assert(foundEvents.length === 1)
+                assert(foundEvents[0].element === app)
+                assert(mutatedEvents.length === 1)
+                assert(mutatedEvents[0].element === app)
+                done()
+            }
+        })
+        domObserver.observe({
+            name: "appContainer",
+            selector: "#app",
+            observerConfig,
+        })
+        appendElement(app, "div")
     })
 })
