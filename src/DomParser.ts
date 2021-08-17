@@ -127,9 +127,14 @@ export function parseDOM(
 
     if (config.type === "boolean") {
         const parentElement = rootElement || window.document
-        const targetElement = parentElement.querySelector<Element>(
+        let targetElement = parentElement.querySelector<Element>(
             config.selector
         )
+        if (!targetElement && parentElement instanceof Element) {
+            targetElement = parentElement.matches(config.selector)
+                ? parentElement
+                : null
+        }
         const targetElementExists = Boolean(targetElement)
         return !config.inverse ? targetElementExists : !targetElementExists
     }
