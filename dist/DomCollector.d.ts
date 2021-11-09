@@ -6,13 +6,13 @@
  * You can obtain License text at https://github.com/retentioneering/retentioneering-dom-observer/blob/master/LICENSE.md
  */
 import { DomObserver, MainObserverCb, ObserveDomEvent } from "./DomObserver";
-import { ParserConfig } from "./DomParser";
+import { ParserConfig, ParseDomResult } from "./DomParser";
 export declare type DomCollectorTarget = {
     name: string;
     targetSelector: string;
     guardSelector?: string;
     childGuardSelector?: string;
-    guard?: (rootElement: Element) => boolean;
+    guard?: (rootElement: Element, parsedContent: ParseDomResult) => boolean;
     parseRootEl?: string | Element;
     observeConfig?: MutationObserverInit;
     parseConfig: ParserConfig;
