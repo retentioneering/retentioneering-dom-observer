@@ -253,4 +253,39 @@ describe("DomCollector", () => {
         createCart()
         addItemToCart("Motherboard", "4000", "3400")
     })
+
+    it("guard", (done) => {
+        const target: DomCollectorTarget = {
+            name: "cart",
+            targetSelector: "#cart",
+            guardSelector: ".item",
+            parseRootEl: "#cart",
+            guard: (_, result: any) => result.cart.items.length > 1, 
+            parseConfig,
+        }
+        // TODO: костыль. Разобраться почему вызывается
+        let doneCalled = false
+        const onCollect = sinon.spy(({ name, parsedContent }) => {
+            if (doneCalled) {
+                return
+            }
+            assert(name === "cart")
+            assert(onCollect.callCount === 1)
+            assert(parsedContent.cart.items.length === 2)
+            if (!doneCalled) done()
+            doneCalled = true
+        })
+        const mainObserverCallback = sinon.fake()
+        createDomCollector({
+            targets: [target],
+            rootEl: document.body,
+            onCollect,
+            mainObserverCallback,
+        })
+        createCart()
+        addItemToCart("Motherboard", "4000", "3400")
+        setTimeout(() => {
+            addItemToCart("Motherboard", "4000", "3400")
+        }, 100)
+    })
 })

@@ -13,7 +13,7 @@ export type DomCollectorTarget = {
     targetSelector: string
     guardSelector?: string
     childGuardSelector?: string
-    guard?: (rootElement: Element) => boolean
+    guard?: (rootElement: Element, parsedContent: ParseDomResult) => boolean
     parseRootEl?: string | Element
     observeConfig?: MutationObserverInit
     parseConfig: ParserConfig
@@ -88,11 +88,13 @@ export const createDomCollector = ({
                     return
                 }
 
-                if (guard && !guard(parseRootEl)) {
+
+                const parsedContent = parseDOM(target.parseConfig, parseRootEl)
+
+                if (guard && !guard(parseRootEl, parsedContent)) {
                     return
                 }
 
-                const parsedContent = parseDOM(target.parseConfig, parseRootEl)
                 onCollect({
                     name: target.name,
                     payload: target.payload,
